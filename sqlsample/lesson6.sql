@@ -38,7 +38,7 @@ call get_questionid_content_from_account_info('ducanht1108@gmail.com', 'anh.tran
 select @question_id_output, @content_output;
 
 -- ví dụ 4: chỉ hiển thị thông tin username và fullname liền nhau của account khi đã biết input là account_id 
-select concat('Nguyễn', ' ', 'An') as my_name;
+select concat('Nguyễn', ' ', 'An', ' ', '1994') as my_name;
 -- drop procedure if exists get_username_fullname_by_accountId;
 delimiter $$
 create procedure get_username_fullname_by_accountId(in accountId_input int)
@@ -140,5 +140,51 @@ create table student(
 	id int primary key,
     `name` varchar(50),
     class_id int,
-    foreign key (class_id) references class(id) on update set null on delete set null
+    foreign key (class_id) references class(id) on update cascade on delete cascade
+    -- on update set null on delete set null
 );
+
+/**Bai tap assignment*/
+-- bai 4 
+delimiter $$
+create procedure max_typeid_question (out typeid_output int)
+	begin 
+		select type_id into typeid_output from question q group by type_id
+		having count(*) = (select count(*) as so_luong from question group by type_id order by so_luong desc limit 1 ) ;
+	end $$
+delimiter ;
+
+set @typeid_output = 0;
+call max_typeid_question(@typeid_output);
+select @typeid_output;
+-- Question 5 
+select * from type_question where type_id = @typeid_output;
+
+/*
+-- bài 6 
+Viết 1 store cho phép người dùng nhập vào 1 chuỗi -- => in varchar_input varchar 
+và trả về group có tên  -- => bảng group, group_name 
+chứa chuỗi của người dùng nhập vào  group_name like concat('%', varchar_input, '%') -- '%CLB%'
+ 
+ hoặc UNION 
+ 
+ hoặc trả về user có username chứa -- bảng account, username 
+ chuỗi của người dùng nhập vào  username like concat('%', varchar_input, '%')
+*/
+select group_name from `group` where group_name like '%CLB%';
+select group_name from `group` where group_name like concat('%', 'CLB', '%');
+select group_name from `group` where group_name like '%CLB%'
+union
+select username from `account` where username like '%CLB%';
+-- Question6
+delimiter $$
+create procedure find_groupname_username (in `name` varchar(50))
+	begin 
+		select group_name from `group` where group_name like concat('%',  `name`, '%')
+		union
+		select username from `account` where username like concat('%',  `name`, '%');
+	end $$
+delimiter ;
+
+
+
