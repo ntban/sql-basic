@@ -140,7 +140,7 @@ create table student(
 	id int primary key,
     `name` varchar(50),
     class_id int,
-    foreign key (class_id) references class(id) on update cascade on delete cascade
+    foreign key (class_id) references class(id) on update set null on delete set null
     -- on update set null on delete set null
 );
 
